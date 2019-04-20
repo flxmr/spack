@@ -45,14 +45,16 @@ sha256='0995fb36857dd76ccfb8bb07350c214d9f9099e80b1e66b4a8909311f24ff0db')
 
     patch('gcc.patch', when='@6.1.0')
 
-    # At the moment, we cannot build with both osmesa and qt, but as of
-    # VTK 8.1, that should change
-    conflicts('+osmesa', when='+qt')
+    # At the moment, we cannot build with both osmesa and X11-toolkits, but as of
+    # VTK 8.1, that changed
+    conflicts('+osmesa', when='@:8.1 +qt')
 
     # Tk dependency
-    depends_on('tk', when='+tk')
-    depends_on('tcl', when='+tk')
+    depends_on('tk', when='+tk', type=('build', 'run', 'link'))
+    depends_on('tcl', when='+tk', type=('build', 'run', 'link'))
     depends_on('tk', when='+tkinter')
+    depends_on('libx11', when='+tkinter')
+    depends_on('mesa-glu', when='+osmesa +tkinter')
 
     conflicts('~tk', when='+tkinter')
 
@@ -215,17 +217,22 @@ sha256='0995fb36857dd76ccfb8bb07350c214d9f9099e80b1e66b4a8909311f24ff0db')
                 '-DVTK_WRAP_TCL=ON',
                 '-DModule_vtkTclTk=ON',
                 '-DUSE_TK:BOOL=ON',
+                '-DVTK_Group_Tk=ON',
                 '-DModule_vtkRenderingTk:BOOL=ON',
                 '-DTCL_INCLUDE_PATH={0}'.format(spec['tcl'].prefix.include),
                 '-DTCL_LIBRARY={0}/lib/libtcl{1}.so'.format(spec['tcl'].prefix, tcl_ver),
                 '-DTCL_TCLSH={0}/bin/tclsh{1}'.format(spec['tcl'].prefix, tcl_ver),
                 '-DTK_INCLUDE_PATH={0}'.format(spec['tk'].prefix.include),
-                '-DTK_LIBRARY={0}/lib/libtk{1}.so'.format(spec['tk'].prefix, tk_ver)
+                '-DTK_LIBRARY={0}/lib/libtk{1}.so'.format(spec['tk'].prefix, tk_ver),
+                #'-DVTK_TCL_TK_STATIC=ON' 
             ])
 
             if '+tkinter' in spec:
                 #test with python -c "import vtk.tk.vtkTkRenderWindowInteractor; vtk.tk.vtkTkRenderWindowInteractor.vtkRenderWindowInteractorConeExample()"
                 #no tkinter specific things?
+                cmake_args.extend([
+                    '-DVTK_PYTHON_VERSION={0}'.format(spec['python'].version.up_to(1)),
+                    ])
                 pass
         else:
             cmake_args.extend([
@@ -263,12 +270,16 @@ sha256='0995fb36857dd76ccfb8bb07350c214d9f9099e80b1e66b4a8909311f24ff0db')
             osmesa_include_dir = prefix.include
             osmesa_library = os.path.join(prefix.lib, 'libOSMesa.so')
 
-            use_param = 'VTK_USE_X'
+            draw_api = 'VTK_USE_X'
             if 'darwin' in spec.architecture:
-                use_param = 'VTK_USE_COCOA'
+                draw_api = 'VTK_USE_COCOA'
+
+            mesa_draw = 'OFF'
+            if '+tkinter' in spec:
+                mesa_draw = 'ON'
 
             cmake_args.extend([
-                '-D{0}:BOOL=OFF'.format(use_param),
+                '-D{0}:BOOL={1}'.format(draw_api, mesa_draw),
                 '-DVTK_OPENGL_HAS_OSMESA:BOOL=ON',
                 '-DOSMESA_INCLUDE_DIR:PATH={0}'.format(osmesa_include_dir),
                 '-DOSMESA_LIBRARY:FILEPATH={0}'.format(osmesa_library),

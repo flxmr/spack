@@ -54,6 +54,8 @@ sha256='0995fb36857dd76ccfb8bb07350c214d9f9099e80b1e66b4a8909311f24ff0db')
     depends_on('tcl', when='+tk', type=('build', 'run', 'link'))
     depends_on('tk', when='+tkinter')
     depends_on('libx11', when='+tkinter')
+    depends_on('libxt', when='+tkinter')
+    
     depends_on('mesa-glu', when='+osmesa +tkinter')
 
     conflicts('~tk', when='+tkinter')

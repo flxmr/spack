@@ -50,13 +50,13 @@ sha256='0995fb36857dd76ccfb8bb07350c214d9f9099e80b1e66b4a8909311f24ff0db')
     conflicts('+osmesa', when='@:8.1 +qt')
 
     # Tk dependency
-    depends_on('tk', when='+tk', type=('build', 'run', 'link'))
-    depends_on('tcl', when='+tk', type=('build', 'run', 'link'))
-    depends_on('tk', when='+tkinter')
-    depends_on('libx11', when='+tkinter')
-    depends_on('libxt', when='+tkinter')
-    
-    depends_on('mesa-glu', when='+osmesa +tkinter')
+    depends_on('tk', when='+tk')
+    depends_on('tcl', when='+tk')
+    depends_on('libx11', when='+tk')
+    depends_on('libxt', when='+tk')
+
+    depends_on('mesa-glu', when='+osmesa +tk')
+    depends_on('mesa-glu', when='+osmesa +qt')
 
     conflicts('~tk', when='+tkinter')
 
@@ -100,7 +100,7 @@ sha256='0995fb36857dd76ccfb8bb07350c214d9f9099e80b1e66b4a8909311f24ff0db')
     depends_on('expat')
     depends_on('freetype')
     depends_on('glew')
-    depends_on('hdf5+hl') #netcdf needs highlevel-API
+    depends_on('hdf5+hl') # netcdf needs highlevel-API
     depends_on('libjpeg')
     depends_on('jsoncpp')
     depends_on('libxml2')
@@ -147,7 +147,6 @@ sha256='0995fb36857dd76ccfb8bb07350c214d9f9099e80b1e66b4a8909311f24ff0db')
 
             # Disable wrappers for other languages.
             '-DVTK_WRAP_JAVA=OFF',
-            '-DVTK_WRAP_TCL=OFF',
         ]
 
         if '+haru' in spec:
@@ -178,7 +177,8 @@ sha256='0995fb36857dd76ccfb8bb07350c214d9f9099e80b1e66b4a8909311f24ff0db')
                 '-DPYTHON_EXECUTABLE={0}'.format(spec['python'].command.path),
                 '-DPYTHON_INCLUDE_DIR={0}/python{1}m'.format(spec['python'].prefix.include, pyver),
                 '-DPYTHON_LIBRARY={0}/lib/libpython{1}m.so'.format(spec['python'].prefix, pyver),
-                '-DVTK_USE_SYSTEM_MPI4PY:BOOL=ON'
+                '-DVTK_USE_SYSTEM_MPI4PY:BOOL=ON',
+                '-DVTK_PYTHON_VERSION={0}'.format(spec['python'].version.up_to(1)),
             ])
         else:
             cmake_args.append('-DVTK_WRAP_PYTHON=OFF')
@@ -226,21 +226,18 @@ sha256='0995fb36857dd76ccfb8bb07350c214d9f9099e80b1e66b4a8909311f24ff0db')
                 '-DTCL_TCLSH={0}/bin/tclsh{1}'.format(spec['tcl'].prefix, tcl_ver),
                 '-DTK_INCLUDE_PATH={0}'.format(spec['tk'].prefix.include),
                 '-DTK_LIBRARY={0}/lib/libtk{1}.so'.format(spec['tk'].prefix, tk_ver),
-                #'-DVTK_TCL_TK_STATIC=ON' 
             ])
 
             if '+tkinter' in spec:
-                #test with python -c "import vtk.tk.vtkTkRenderWindowInteractor; vtk.tk.vtkTkRenderWindowInteractor.vtkRenderWindowInteractorConeExample()"
-                #no tkinter specific things?
-                cmake_args.extend([
-                    '-DVTK_PYTHON_VERSION={0}'.format(spec['python'].version.up_to(1)),
-                    ])
+                # test with python -c "import vtk.tk.vtkTkRenderWindowInteractor; \
+                # vtk.tk.vtkTkRenderWindowInteractor.vtkRenderWindowInteractorConeExample()"
+                # no tkinter specific things?
                 pass
         else:
             cmake_args.extend([
                 '-DVTK_WRAP_TCL=OFF'
             ])
-            
+
         if '+xdmf' in spec:
             if spec.satisfies('^cmake@3.12:'):
                 # This policy exists only for CMake >= 3.12
@@ -277,7 +274,8 @@ sha256='0995fb36857dd76ccfb8bb07350c214d9f9099e80b1e66b4a8909311f24ff0db')
                 draw_api = 'VTK_USE_COCOA'
 
             mesa_draw = 'OFF'
-            if '+tkinter' in spec:
+
+            if '+tkinter' in spec or '+qt' in spec:
                 mesa_draw = 'ON'
 
             cmake_args.extend([
@@ -331,3 +329,10 @@ sha256='0995fb36857dd76ccfb8bb07350c214d9f9099e80b1e66b4a8909311f24ff0db')
                 cmake_args.extend(['-DVTK_REQUIRED_OBJCXX_FLAGS=""'])
 
         return cmake_args
+
+    def setup_environment(self, spack_env, run_env):
+        pyver = self.spec['python'].version.up_to(2)
+        run_env.prepend_path('PYTHON_PATH',
+                             join_path(self.prefix, 'lib64',
+                                       'python{}'.format(pyver), 'site-packages'))
+

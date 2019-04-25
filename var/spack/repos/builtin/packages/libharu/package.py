@@ -21,9 +21,6 @@ class Libharu(AutotoolsPackage):
     version('2.3.0', '4f916aa49c3069b3a10850013c507460')
     version('2.2.0', 'b65a6fc33a0bdad89bec6b7def101f01')
 
-    #add for working with VTK!
-    #variant('ff', default=False, description="Fix https://github.com/libharu/libharu/pull/157")
-
     depends_on('libtool', type=('build'))
     depends_on('autoconf', type=('build'))
     depends_on('automake', type=('build'))

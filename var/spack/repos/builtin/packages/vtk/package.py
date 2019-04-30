@@ -38,11 +38,6 @@ sha256='0995fb36857dd76ccfb8bb07350c214d9f9099e80b1e66b4a8909311f24ff0db')
     variant('ffmpeg', default=False, description='Build with FFMPEG support')
     variant('mpi', default=True, description='Enable MPI support')
 
-    # Haru causes trouble on Fedora and Ubuntu in v8.1.1
-    # See https://bugzilla.redhat.com/show_bug.cgi?id=1460059#c13
-    # probably related: https://github.com/libharu/libharu/pull/157
-    variant('haru', default=True, description='Enable libharu')
-
     patch('gcc.patch', when='@6.1.0')
 
     # At the moment, we cannot build with both osmesa and X11-toolkits, but as of
@@ -85,9 +80,6 @@ sha256='0995fb36857dd76ccfb8bb07350c214d9f9099e80b1e66b4a8909311f24ff0db')
 
     depends_on('mpi', when='+mpi')
 
-    depends_on('libharu', when='+haru')
-    depends_on('libharu+ff', when='+haru @8.1:')
-
     depends_on('boost', when='+xdmf')
     depends_on('boost+mpi', when='+xdmf +mpi')
 
@@ -128,6 +120,7 @@ sha256='0995fb36857dd76ccfb8bb07350c214d9f9099e80b1e66b4a8909311f24ff0db')
         cmake_args = [
             '-DBUILD_SHARED_LIBS=ON',
             '-DVTK_RENDERING_BACKEND:STRING={0}'.format(opengl_ver),
+
             # In general, we disable use of VTK "ThirdParty" libs, preferring
             # spack-built versions whenever possible
             '-DVTK_USE_SYSTEM_LIBRARIES:BOOL=ON',
@@ -136,6 +129,7 @@ sha256='0995fb36857dd76ccfb8bb07350c214d9f9099e80b1e66b4a8909311f24ff0db')
             '-DVTK_USE_SYSTEM_LIBPROJ:BOOL=OFF',
             '-DVTK_USE_SYSTEM_PUGIXML:BOOL=OFF',
             '-DVTK_USE_SYSTEM_GL2PS:BOOL=OFF',
+            '-DVTK_USE_SYSTEM_LIBHARU=OFF',
             '-DVTK_USE_SYSTEM_LIBPROJ4:BOOL=OFF',
             '-DVTK_USE_SYSTEM_OGG:BOOL=OFF',
             '-DVTK_USE_SYSTEM_THEORA:BOOL=OFF',

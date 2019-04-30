@@ -14,6 +14,7 @@ class Siesta(Package):
 
     homepage = "https://departments.icmab.es/leem/siesta/"
 
+    version('4.0.2', '5f6d1c2ffb96c58bb45c5d76b6bb4bb2', url='https://launchpad.net/siesta/4.0/4.0.2/+download/siesta-4.0.2.tar.gz')
     version('4.0.1', '5cb60ce068f2f6e84fa9184ffca94c08', url='https://launchpad.net/siesta/4.0/4.0.1/+download/siesta-4.0.1.tar.gz')
     version('3.2-pl-5', '27a300c65eb2a25d107d910d26aaf81a', url='http://departments.icmab.es/leem/siesta/CodeAccess/Code/siesta-3.2-pl-5.tgz')
 

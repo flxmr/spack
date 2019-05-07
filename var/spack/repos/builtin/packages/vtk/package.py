@@ -5,6 +5,7 @@
 
 
 import os
+import sys
 from spack import *
 
 
@@ -66,14 +67,14 @@ sha256='0995fb36857dd76ccfb8bb07350c214d9f9099e80b1e66b4a8909311f24ff0db')
     # The use of the OpenGL2 backend requires at least OpenGL Core Profile
     # version 3.2 or higher.
     depends_on('gl@3.2:', when='+opengl2')
+    depends_on('gl@1.2:', when='~opengl2')
 
-    # If you didn't ask for osmesa, then hw rendering using vendor-specific
-    # drivers is faster, but it must be done externally.
-    depends_on('opengl', when='~osmesa')
+    if sys.platform != 'darwin':
+        depends_on('glx', when='~osmesa')
 
     # Note: it is recommended to use mesa+llvm, if possible.
     # mesa default is software rendering, llvm makes it faster
-    depends_on('mesa', when='+osmesa')
+    depends_on('mesa+osmesa', when='+osmesa')
 
     # VTK will need Qt5OpenGL, and qt needs '-opengl' for that
     depends_on('qt+opengl', when='+qt')

@@ -15,9 +15,10 @@ class Wannier90(MakefilePackage):
     Wannier90 is released under the GNU General Public License.
     """
     homepage = 'http://wannier.org'
-    url = 'http://wannier.org/code/wannier90-2.0.1.tar.gz'
+    url = 'https://github.com/wannier-developers/wannier90/archive/v3.0.0.tar.gz'
 
-    version('2.1.0', '07a81c002b41d6d0f97857e55c57d769')
+    version('3.0.0', sha256='f196e441dcd7b67159a1d09d2d7de2893b011a9f03aab6b30c4703ecbf20fe5b')
+    version('2.1.0', sha256='c0e238be22c7d9bf3c93b2651747c75705e97db63173064e679f3820dc85fda4')
     version('2.0.1', '4edd742506eaba93317249d33261fb22')
 
     depends_on('mpi')

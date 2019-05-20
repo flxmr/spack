@@ -21,6 +21,7 @@ class QuantumEspresso(Package):
     git = 'https://gitlab.com/QEF/q-e.git'
 
 
+    version('6.4.1', sha256='b0d7e9f617b848753ad923d8c6ca5490d5d82495f82b032b71a0ff2f2e9cfa08')
     version('6.4', sha256='781366d03da75516fdcf9100a1caadb26ccdd1dedd942a6f8595ff0edca74bfe')
     version('6.3',   '1b67687d90d1d16781d566d44d14634c')
     version('6.2.1', '769cc973382156bffd35254c3dbaf453')

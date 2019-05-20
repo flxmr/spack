@@ -27,7 +27,10 @@ class Mesa(MesonPackage):
     version('develop',      branch='master')
 
     depends_on('meson@0.45:', type='build')
+
     depends_on('binutils', type='build')
+    depends_on('bison', type='build')
+    depends_on('flex', type='build')
     depends_on('pkgconfig', type='build')
     depends_on('python@3:', type='build')
     depends_on('py-mako@0.8.0:', type='build')
